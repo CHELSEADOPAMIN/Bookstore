@@ -1,0 +1,17 @@
+{
+  "name": "Local Books Bookstore",
+  "short_name": "LocalBooks",
+  "description": "Bilingual bookstore cafe PWA prototype / 双语书店咖啡原型",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f5f0e5",
+  "theme_color": "#15231d",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Reset Local Books Cache</title>
+    <style>
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        background: #f5f0e5;
+        color: #15231d;
+        font: 16px/1.5 Georgia, serif;
+      }
+      main {
+        max-width: 520px;
+        padding: 32px;
+        border: 1px solid rgba(21, 35, 29, 0.14);
+        border-radius: 14px;
+        background: #fffaf0;
+      }
+      button,
+      a {
+        display: inline-flex;
+        margin-top: 18px;
+        padding: 12px 18px;
+        border-radius: 999px;
+        border: 0;
+        background: #15231d;
+        color: #f5f0e5;
+        font-weight: 700;
+        text-decoration: none;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Cache reset complete</h1>
+      <p id="status">Clearing old service workers and caches...</p>
+      <a href="/">Return to app</a>
+    </main>
+    <script>
+      async function reset() {
+        if ("serviceWorker" in navigator) {
+          const regs = await navigator.serviceWorker.getRegistrations();
+          await Promise.all(regs.map((reg) => reg.unregister()));
+        }
+        if ("caches" in window) {
+          const keys = await caches.keys();
+          await Promise.all(keys.map((key) => caches.delete(key)));
+        }
+        document.getElementById("status").textContent =
+          "Old service workers and caches were removed. Return to the app and hard refresh once.";
+      }
+      reset();
+    </script>
+  </body>
+</html>
