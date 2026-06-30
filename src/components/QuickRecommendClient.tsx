@@ -6,6 +6,16 @@ import { books } from "@/data/mock";
 import { BookCard } from "@/components/BookCard";
 import { useLanguage } from "@/lib/useLanguage";
 
+type Book = (typeof books)[number];
+
+const searchableBookText = (book: Book) =>
+  [book.title, book.author, book.mood, book.desc, ...book.tags].join(" ").toLowerCase();
+
+const hasAnyTerm = (book: Book, terms: string[]) => {
+  const text = searchableBookText(book);
+  return terms.some((term) => text.includes(term));
+};
+
 const categories = [
   {
     id: "all",
@@ -14,45 +24,62 @@ const categories = [
     match: () => true,
   },
   {
+    id: "adult",
+    label: { en: "25-44 Adult Picks", zh: "25-44 成人精选" },
+    description: { en: "Most of the shelf: contemporary fiction, career growth, relationships, and identity.", zh: "书架主体：当代小说、职业成长、情感关系和身份议题。" },
+    match: (book: Book) =>
+      hasAnyTerm(book, ["25-44", "professional", "relationship", "work life", "identity"]),
+  },
+  {
+    id: "children",
+    label: { en: "Kids", zh: "儿童读物" },
+    description: { en: "Child-friendly classics and family reading choices.", zh: "适合小孩阅读或亲子共读的经典与轻松读物。" },
+    match: (book: Book) =>
+      hasAnyTerm(book, ["children", "kid", "family read", "middle grade", "picture book"]),
+  },
+  {
+    id: "senior",
+    label: { en: "Older Readers", zh: "长辈阅读" },
+    description: { en: "Clear plots, warmer pacing, memoirs, and cosy mysteries for older readers.", zh: "故事清楚、节奏更舒适，适合长辈慢慢读。" },
+    match: (book: Book) =>
+      hasAnyTerm(book, ["senior friendly", "older readers", "large-print friendly", "gentle pace", "cosy", "cozy"]),
+  },
+  {
+    id: "languages",
+    label: { en: "World Languages", zh: "多语种展示" },
+    description: { en: "A small showcase of Chinese, French, Japanese, and Spanish titles.", zh: "少量展示中文、法语、日语和西语书。" },
+    match: (book: Book) =>
+      hasAnyTerm(book, ["language showcase", "chinese language", "french language", "japanese language", "spanish language"]),
+  },
+  {
     id: "australian",
     label: { en: "Australian", zh: "澳洲本地" },
     description: { en: "Local authors, settings, or Australian context.", zh: "澳洲作者、背景或本地语境。" },
-    match: (book: (typeof books)[number]) =>
-      [...book.tags, book.desc, book.mood].join(" ").toLowerCase().includes("australia") ||
-      [...book.tags, book.desc].join(" ").toLowerCase().includes("brisbane") ||
-      [...book.tags, book.desc].join(" ").toLowerCase().includes("local"),
+    match: (book: Book) =>
+      hasAnyTerm(book, ["australia", "australian", "brisbane", "local"]),
   },
   {
     id: "fast",
     label: { en: "Fast Read", zh: "周末快读" },
     description: { en: "Strong pace, weekend-friendly picks.", zh: "节奏快，适合周末读完。" },
-    match: (book: (typeof books)[number]) =>
-      [...book.tags, book.desc].join(" ").toLowerCase().includes("fast") ||
+    match: (book: Book) =>
+      hasAnyTerm(book, ["fast"]) ||
       book.title === "The Dry",
-  },
-  {
-    id: "adult",
-    label: { en: "25-44 Adult Picks", zh: "25-44 成人精选" },
-    description: { en: "Contemporary fiction, career growth, relationships, and identity.", zh: "当代小说、职业成长、情感关系和身份议题。" },
-    match: (book: (typeof books)[number]) =>
-      [...book.tags, book.desc].join(" ").toLowerCase().includes("25-44") ||
-      [...book.tags, book.desc].join(" ").toLowerCase().includes("professional") ||
-      [...book.tags, book.desc].join(" ").toLowerCase().includes("relationship"),
   },
   {
     id: "chinese",
     label: { en: "Chinese Literature", zh: "中文书" },
     description: { en: "Original Chinese titles and Chinese-reader favourites.", zh: "中文原版书与中国读者熟悉的作品。" },
-    match: (book: (typeof books)[number]) =>
-      [...book.tags, book.desc, book.author, book.title].join(" ").toLowerCase().includes("chinese") ||
+    match: (book: Book) =>
+      searchableBookText(book).includes("chinese") ||
       /[\u3400-\u9fff]/.test(book.title),
   },
   {
     id: "bookclub",
     label: { en: "Book Club", zh: "读书会" },
     description: { en: "Easy to discuss with local readers.", zh: "适合本地读书会讨论。" },
-    match: (book: (typeof books)[number]) =>
-      [...book.tags, book.desc].join(" ").toLowerCase().includes("book club") ||
+    match: (book: Book) =>
+      hasAnyTerm(book, ["book club"]) ||
       book.title === "The Dictionary of Lost Words" ||
       book.title === "活着",
   },
@@ -60,15 +87,15 @@ const categories = [
     id: "nonfiction",
     label: { en: "Non-fiction", zh: "非虚构" },
     description: { en: "History, place, culture, and ideas.", zh: "历史、地方、文化和观点类阅读。" },
-    match: (book: (typeof books)[number]) =>
-      [...book.tags, book.desc].join(" ").toLowerCase().includes("non-fiction") ||
+    match: (book: Book) =>
+      hasAnyTerm(book, ["non-fiction"]) ||
       book.title === "Dark Emu",
   },
   {
     id: "warm",
     label: { en: "Warm & Emotional", zh: "温暖情感" },
     description: { en: "Gentler novels with emotional pull.", zh: "更温柔、更有情绪牵引的小说。" },
-    match: (book: (typeof books)[number]) =>
+    match: (book: Book) =>
       book.mood.toLowerCase().includes("warm") ||
       book.mood.toLowerCase().includes("emotional"),
   },

@@ -33,8 +33,8 @@ export function MemberSummary() {
       <div className="mt-6 grid grid-cols-3 gap-3">
         {[
           { key: "points", label: <T en="Points" zh="积分" />, value: `${member.points}` },
-          { key: "discount", label: <T en="Discount" zh="折扣" />, value: "8%" },
-          { key: "perks", label: <T en="Perks" zh="权益" />, value: "5" },
+          { key: "discount", label: <T en="Student Price" zh="学生价" />, value: member.studentDiscountEligible ? "9折" : <T en="Regular" zh="原价" /> },
+          { key: "perks", label: <T en="Perks" zh="权益" />, value: member.studentDiscountEligible ? "6" : "5" },
         ].map((item) => (
           <div key={item.key} className="rounded-lg bg-white/10 p-3">
             <p className="text-xs text-[#e9ddc8]">{item.label}</p>
@@ -44,7 +44,11 @@ export function MemberSummary() {
       </div>
       <div className="mt-5 flex items-center gap-2 rounded-lg bg-white/10 p-3 text-sm text-[#e9ddc8]">
         <Sparkles size={16} />
-        <T en="Spend $18 more this month to unlock a buy-one-get-one coffee voucher." zh="本月再消费 $18 可获得咖啡券。" />
+        {member.studentDiscountEligible ? (
+          <T en="Student 10% off is active for cafe checkout." zh="学生 9 折会在咖啡结账自动生效。" />
+        ) : (
+          <T en="Spend $18 more this month to unlock a buy-one-get-one coffee voucher." zh="本月再消费 $18 可获得咖啡券。" />
+        )}
       </div>
     </div>
   );

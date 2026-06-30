@@ -16,7 +16,9 @@ export function LoginClient() {
       <div className="rounded-xl border border-[#15231d]/10 bg-[#15231d] p-6 text-[#f5f0e5]">
         <p className="text-sm text-[#d9a441]"><T en="Signed in with localStorage" zh="已使用本地存储登录" /></p>
         <h2 className="mt-2 font-serif text-4xl font-black">{member.name}</h2>
-        <p className="mt-2 text-[#e9ddc8]">{member.phone} · {member.level} Member · {member.points} <T en="pts" zh="积分" /></p>
+        <p className="mt-2 text-[#e9ddc8]">
+          {member.phone} · {member.level} Member · {member.studentDiscountEligible ? <T en="Student 10% off" zh="学生 9 折" /> : <T en="Standard perks" zh="标准权益" />} · {member.points} <T en="pts" zh="积分" />
+        </p>
         <button onClick={logout} className="mt-6 inline-flex h-11 items-center gap-2 rounded-full bg-white/10 px-5 font-bold">
           <LogOut size={16} />
           <T en="Sign Out" zh="退出" />

@@ -3,12 +3,14 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { coffees } from "@/data/mock";
+import type { MembershipPlan } from "@/lib/membership";
 
 type Member = {
   name: string;
   phone: string;
   points: number;
   level: "Seed" | "Shelf" | "Collector";
+  studentDiscountEligible: boolean;
 };
 
 type CartItem = {
@@ -22,8 +24,9 @@ type CartItem = {
 type AppState = {
   member: Member | null;
   membershipPurchased: boolean;
+  membershipPlan: MembershipPlan;
   cart: CartItem[];
-  purchaseMembership: () => void;
+  purchaseMembership: (plan: MembershipPlan) => void;
   login: (name: string, phone: string) => void;
   logout: () => void;
   addCoffee: (id: string, options?: string) => void;
@@ -36,17 +39,26 @@ export const useAppStore = create<AppState>()(
     (set) => ({
       member: null,
       membershipPurchased: false,
+      membershipPlan: "standard",
       cart: [],
-      purchaseMembership: () => set({ membershipPurchased: true }),
+      purchaseMembership: (plan) =>
+        set((state) => ({
+          membershipPurchased: true,
+          membershipPlan: plan,
+          member: state.member
+            ? { ...state.member, studentDiscountEligible: plan === "student" }
+            : state.member,
+        })),
       login: (name, phone) =>
-        set({
+        set((state) => ({
           member: {
             name,
             phone,
             points: 2680,
             level: "Collector",
+            studentDiscountEligible: state.membershipPlan === "student",
           },
-        }),
+        })),
       logout: () => set({ member: null }),
       addCoffee: (id, options) =>
         set((state) => {

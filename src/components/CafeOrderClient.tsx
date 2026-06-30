@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { Minus, Plus, ShoppingBag, Trash2 } from "lucide-react";
 import { coffees } from "@/data/mock";
 import { currency } from "@/lib/utils";
+import { studentDiscount } from "@/lib/membership";
 import { useAppStore } from "@/store/useAppStore";
 import { Panel } from "@/components/ui";
 import { LocalizedText, T } from "@/components/I18nText";
@@ -30,7 +31,10 @@ export function CafeOrderClient() {
   const [selectedSugar, setSugar] = useState(sugar[1].en);
   const [selectedMilk, setMilk] = useState(milk[0].en);
   const { cart, addCoffee, removeItem, clearCart } = useAppStore();
-  const total = useMemo(() => cart.reduce((sum, item) => sum + item.price * item.qty, 0), [cart]);
+  const member = useAppStore((state) => state.member);
+  const subtotal = useMemo(() => cart.reduce((sum, item) => sum + item.price * item.qty, 0), [cart]);
+  const discount = member?.studentDiscountEligible ? studentDiscount(subtotal) : 0;
+  const total = subtotal - discount;
 
   const add = () => addCoffee(coffee, `${selectedIce} / ${selectedSugar} / ${selectedMilk}`);
 
@@ -104,9 +108,25 @@ export function CafeOrderClient() {
             ))
           )}
         </div>
-        <div className="mt-5 flex items-center justify-between border-t border-[#15231d]/10 pt-4">
-          <span className="text-sm text-[#66746b]"><T en="Total" zh="合计" /></span>
-          <span className="font-serif text-3xl font-black">{currency(total)}</span>
+        <div className="mt-5 space-y-2 border-t border-[#15231d]/10 pt-4">
+          <div className="flex items-center justify-between">
+            <span className="text-sm text-[#66746b]"><T en="Subtotal" zh="小计" /></span>
+            <span className="font-bold">{currency(subtotal)}</span>
+          </div>
+          {discount > 0 ? (
+            <div className="flex items-center justify-between text-[#2f5f4f]">
+              <span className="text-sm font-black"><T en="Student 10% off" zh="学生 9 折" /></span>
+              <span className="font-bold">-{currency(discount)}</span>
+            </div>
+          ) : (
+            <p className="rounded-lg bg-white/60 p-3 text-xs font-bold text-[#66746b]">
+              <T en="Student members get 10% off after sign in." zh="学生会员登录后自动享受 9 折。" />
+            </p>
+          )}
+          <div className="flex items-center justify-between pt-2">
+            <span className="text-sm text-[#66746b]"><T en="Total" zh="合计" /></span>
+            <span className="font-serif text-3xl font-black">{currency(total)}</span>
+          </div>
         </div>
         <button
           onClick={clearCart}
